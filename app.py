@@ -6,6 +6,7 @@ from utils.fetch import fetch_data
 from dotenv import load_dotenv
 
 load_dotenv()
+host = os.getenv("HOST")
 port = os.getenv("PORT")
 
 app = Flask(__name__)
@@ -58,4 +59,4 @@ def qa():
 
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=port, debug=True)
+    app.run(host=host, port=port, debug=True)
