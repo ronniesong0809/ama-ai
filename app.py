@@ -6,7 +6,8 @@ from utils.fetch import fetch_data
 from dotenv import load_dotenv
 
 load_dotenv()
-port = os.getenv("PORT")
+host = os.getenv("HOST")
+port = os.getenv("PORT", default=5000)
 
 app = Flask(__name__)
 
@@ -41,21 +42,29 @@ def generate_qa(url, num):
 
 @app.route("/ama", methods=["GET"])
 def ama():
-    input = request.args.get("url")
+    url = request.args.get("url")
     question = request.args.get("question")
 
-    data = get_answer(input, question)
+    data = get_answer(url, question)
     return data
 
 
 @app.route("/qa", methods=["GET"])
 def qa():
-    input = request.args.get("url")
+    url = request.args.get("url")
     num = request.args.get("num", default=10)
 
-    data = generate_qa(input, num)
+    data = generate_qa(url, num)
     return data
 
 
-if __name__ == "__main__":
-    app.run(host="localhost", port=port, debug=True)
+@app.route("/fetch", methods=["GET"])
+def fetch():
+    url = request.args.get("url")
+
+    data = fetch_data(url)
+    return data
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=port)
