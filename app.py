@@ -1,64 +1,13 @@
 import os
 from flask import Flask, request, jsonify
-import requests
-from bs4 import BeautifulSoup
-import openai
+from utils.ai import build_answers, build_questions
+from utils.fetch import fetch_data
 from dotenv import load_dotenv
 
 load_dotenv()
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
 port = os.getenv("PORT")
 
 app = Flask(__name__)
-
-
-def fetch_data(url):
-    r = requests.get(url)
-    print(r.status_code)
-    soup = BeautifulSoup(r.text, "html.parser")
-    if r.status_code == 200:
-        strs = []
-        for node in soup.findAll("p"):
-            strs.append(node.findAll(string=True))
-        page = "".join(str(s) for s in strs)
-        return page
-    else:
-        return ""
-
-
-def build_questions(context, num):
-    try:
-        response = openai.Completion.create(
-            engine="davinci-instruct-beta-v3",
-            prompt=os.getenv("QUESTION_PROMPT").format(num, context),
-            temperature=0,
-            max_tokens=257,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            stop=["\n\n"],
-        )
-        return "1." + response["choices"][0]["text"]
-    except:
-        return ""
-
-
-def build_answers(context, questions):
-    try:
-        response = openai.Completion.create(
-            engine="davinci-instruct-beta-v3",
-            prompt=os.getenv("ANSWER_PROMPT").format(context, questions),
-            temperature=0,
-            max_tokens=257,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            stop=["\n\n"],
-        )
-        return response["choices"][0]["text"]
-    except:
-        return ""
 
 
 def get_answer(url, question):
