@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 from utils.ai import build_answers, build_questions
+from utils.common import remove_leading
 from utils.fetch import fetch_data
 from dotenv import load_dotenv
 
@@ -16,11 +17,8 @@ def get_answer(url, question):
 
     answer = build_answers(context, question)
     print("\nanswers\n" + answer)
-    keys = question.split("\n")
-    values = answer.split("\n")
-    dictionary = dict(zip(keys, values))
 
-    return jsonify(dictionary)
+    return jsonify({"question": question, "answer": answer})
 
 
 def generate_qa(url, num):
@@ -32,9 +30,11 @@ def generate_qa(url, num):
 
     answers = "1." + build_answers(context, questions)
     print("\nanswers\n" + answers)
+
     keys = questions.split("\n")
     values = answers.split("\n")
-    dictionary = dict(zip(keys, values))
+    dictionary = [{'question': remove_leading(key),
+                   'answer': remove_leading(value)} for key, value in zip(keys, values)]
 
     return jsonify(dictionary)
 
@@ -51,7 +51,7 @@ def ama():
 @app.route("/qa", methods=["GET"])
 def qa():
     input = request.args.get("url")
-    num = request.args.get("num")
+    num = request.args.get("num", default=10)
 
     data = generate_qa(input, num)
     return data
