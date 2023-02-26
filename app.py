@@ -1,12 +1,10 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from services import get_answer, get_answer_v2, generate_qa
 from utils.fetch import fetch_data
 from dotenv import load_dotenv
 
 load_dotenv()
-host = os.getenv("HOST")
-port = os.getenv("PORT")
 
 app = Flask(__name__)
 
@@ -53,6 +51,11 @@ def fetch():
 
     data = fetch_data(url, all, tag)
     return data
+
+
+@app.route('/')
+def index():
+    return jsonify({"Message": "Welcome!"})
 
 
 if __name__ == '__main__':
