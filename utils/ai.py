@@ -33,6 +33,6 @@ def build_answers(context, questions):
             presence_penalty=0,
             stop=["\n\n"],
         )
-        return response["choices"][0]["text"]
+        return "1." + response["choices"][0]["text"]
     except:
         return ""

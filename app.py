@@ -22,6 +22,17 @@ def get_answer(url, all, tag, question):
     return jsonify({"question": question, "answer": answer})
 
 
+def get_answer_v2(text, url, all, tag, question):
+    context = fetch_data(url, all, tag)
+    context.append(text)
+    print(context)
+
+    answer = build_answers(context, question)
+    print("\nanswers\n" + answer)
+
+    return jsonify({"question": question, "answer": answer})
+
+
 def generate_qa(url, all, tag, num):
     context = fetch_data(url, all, tag)
     print(context)
@@ -48,6 +59,18 @@ def ama():
     question = request.args.get("question")
 
     data = get_answer(url, all, tag, question)
+    return data
+
+
+@app.route("/ama_v2", methods=["GET"])
+def ama_v2():
+    context = request.args.get("context")
+    url = request.args.get("url")
+    all = request.args.get("all", default=False)
+    tag = request.args.get("tag", default="p")
+    question = request.args.get("question")
+
+    data = get_answer_v2(context, url, all, tag, question)
     return data
 
 
