@@ -1,7 +1,6 @@
 import os
-from flask import Flask, request, jsonify
-from utils.ai import build_answers, build_questions
-from utils.common import remove_leading
+from flask import Flask, request
+from services import get_answer, get_answer_v2, generate_qa
 from utils.fetch import fetch_data
 from dotenv import load_dotenv
 
@@ -10,45 +9,6 @@ host = os.getenv("HOST")
 port = os.getenv("PORT")
 
 app = Flask(__name__)
-
-
-def get_answer(url, all, tag, question):
-    context = fetch_data(url, all, tag)
-    print(context)
-
-    answer = build_answers(context, question)
-    print("\nanswers\n" + answer)
-
-    return jsonify({"question": question, "answer": answer})
-
-
-def get_answer_v2(text, url, all, tag, question):
-    context = fetch_data(url, all, tag)
-    context.append(text)
-    print(context)
-
-    answer = build_answers(context, question)
-    print("\nanswers\n" + answer)
-
-    return jsonify({"question": question, "answer": answer})
-
-
-def generate_qa(url, all, tag, num):
-    context = fetch_data(url, all, tag)
-    print(context)
-
-    questions = build_questions(context, num)
-    print("\nquestions\n" + questions)
-
-    answers = "1." + build_answers(context, questions)
-    print("\nanswers\n" + answers)
-
-    keys = questions.split("\n")
-    values = answers.split("\n")
-    dictionary = [{'question': remove_leading(key),
-                   'answer': remove_leading(value)} for key, value in zip(keys, values)]
-
-    return jsonify(dictionary)
 
 
 @app.route("/ama", methods=["GET"])
@@ -64,13 +24,13 @@ def ama():
 
 @app.route("/ama_v2", methods=["GET"])
 def ama_v2():
-    context = request.args.get("context")
     url = request.args.get("url")
     all = request.args.get("all", default=False)
     tag = request.args.get("tag", default="p")
+    text = request.args.get("text")
     question = request.args.get("question")
 
-    data = get_answer_v2(context, url, all, tag, question)
+    data = get_answer_v2(url, all, tag, text, question)
     return data
 
 
