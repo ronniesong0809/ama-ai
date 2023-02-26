@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 host = os.getenv("HOST")
-port = os.getenv("PORT", default=5000)
+port = os.getenv("PORT")
 
 app = Flask(__name__)
 
@@ -73,4 +73,4 @@ def fetch():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=port)
+    app.run(debug=True, port=os.getenv("PORT", default=5000))
