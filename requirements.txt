@@ -3,3 +3,4 @@ Flask
 openai
 python-dotenv
 gunicorn==20.0.4
+flask_cors
